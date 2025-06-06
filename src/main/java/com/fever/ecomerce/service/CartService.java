@@ -6,6 +6,7 @@ import com.fever.ecomerce.exception.CartNotFoundException;
 import com.fever.ecomerce.model.Cart;
 import com.fever.ecomerce.model.Product;
 import com.fever.ecomerce.storage.LocalStorage;
+import com.fever.ecomerce.utils.CartTimerManager;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,14 +16,18 @@ import java.time.LocalDateTime;
 public class CartService {
     
     private final LocalStorage localStorage;
+    private final CartTimerManager cartTimerManager;
 
-    public CartService(LocalStorage localStorage) {
+    public CartService(LocalStorage localStorage, CartTimerManager cartTimerManager) {
         this.localStorage = localStorage;
+        this.cartTimerManager = cartTimerManager;
     }
 
     public Cart createCart() {
         Cart cart = new Cart();
-        return localStorage.saveCart(cart);
+        cart = localStorage.saveCart(cart);
+        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
+        return cart;
     }
 
     public Cart getCart(String id) {
@@ -30,6 +35,7 @@ public class CartService {
         if (cart == null) {
             throw new CartNotFoundException(id);
         }
+        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
         return cart;
     }
 
@@ -44,6 +50,7 @@ public class CartService {
             cart.getProducts().add(product);
         }
         cart.setLastUpdated(LocalDateTime.now());
+        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
         return cart;
     }
 
@@ -52,5 +59,6 @@ public class CartService {
             throw new CartNotFoundException(id);
         }
         localStorage.deleteCartById(id);
+        cartTimerManager.cancelTimer(id);
     }
 }
