@@ -4,9 +4,6 @@ import com.fever.ecomerce.model.Cart;
 import com.fever.ecomerce.model.Product;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;

@@ -26,7 +26,8 @@ public class CartService {
     public Cart createCart() {
         Cart cart = new Cart();
         cart = localStorage.saveCart(cart);
-        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
+        final String cartId = cart.getId();
+        cartTimerManager.scheduleCartExpiration(cartId, () -> {});
         return cart;
     }
 
@@ -35,7 +36,8 @@ public class CartService {
         if (cart == null) {
             throw new CartNotFoundException(id);
         }
-        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
+        final String cartId = cart.getId();
+        cartTimerManager.scheduleCartExpiration(cartId, () -> {});
         return cart;
     }
 
@@ -50,7 +52,8 @@ public class CartService {
             cart.getProducts().add(product);
         }
         cart.setLastUpdated(LocalDateTime.now());
-        cartTimerManager.scheduleCartExpiration(cart.getId(), () -> {});
+        final String cartId = cart.getId();
+        cartTimerManager.scheduleCartExpiration(cartId, () -> {});
         return cart;
     }
 
